@@ -1,30 +1,43 @@
 #!/bin/bash
 
-# Importa o arquivo de configuração
-source /opt/bacula/etc/bacula-zabbix.conf
+# Import the configuration file
+source /etc/bacula/bacula-zabbix.conf
 
-# Executa o comando 'status dir' via bconsole e captura a saída
-output=$(echo "status dir" | bconsole)
+# Ensure bconsole is available
+if [ -z "${baculaConsole}" ]; then
+  baculaConsole=`which bconsole`
+  if [ -z "${baculaConsole}" ]; then
+    echo ERROR: bconsole is not on the PATH
+    exit 1
+  fi
+fi
+if [ ! -x "${baculaConsole}" ]; then
+  echo ERROR: bconsole ${baculaConsole} is not executable
+  exit 1
+fi
 
-# Conta o número de jobs que estão rodando (status Running)
+# Run the 'status dir' command via bconsole and capture the output
+output=$(echo "status dir" | ${baculaConsole})
+
+# Counts the number of jobs that are running (Running status)
 running_jobs=$(echo "$output" | grep -E -c "is running")
 
-# Captura o horário atual (hora em formato de 24h)
+# Captures the current time (time in 24h format)
 current_hour=$(date +"%-H")
 
-# Sempre envia o número de jobs rodando para o Zabbix
+# Always send the number of running jobs to Zabbix
 $zabbixSender -z $zabbixServer \
         -c $zabbixAgentConfig \
         -s "$baculaHost" \
         -k "bacula.running.jobs" \
-        -o "$running_jobs"
+        -o "$running_jobs" > /dev/null
 
-# Verifica se o horário está entre 9h e 11h ou se o número de jobs rodando for 0
+# Checks if the time is between 9am and 11am or if the number of jobs running is 0
 if [[ ($current_hour -ge 9 && $current_hour -le 11 && $running_jobs -ge 1) || $running_jobs -eq 0 ]]; then
-    # Envia o alerta para o Zabbix
+    # Sends the alert to Zabbix
     $zabbixSender -z $zabbixServer \
         -c $zabbixAgentConfig \
         -s "$baculaHost" \
         -k "bacula.running.jobs.alert" \
-        -o "$running_jobs"
+        -o "$running_jobs" > /dev/null
 fi
