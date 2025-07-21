@@ -10,18 +10,25 @@ job_name="$4";        # %n
 job_level="$5";       # %l
 recipients="$6";      # %r
 job_id="$7";          # %i
+sender="$8"           # %r or no-reply/automated address
+transport="$9"        # P for postfix, B for bsmtp, N for none
 
-# for bsmpt
-# /usr/sbin/bsmtp -h localhost \
-#                -f "(Bacula) <bacula@backup-bacula.tokyo.tequila.jp>" \
-#                -s "Bacula: ${job_type} ${job_exit_status} of \
-#                ${client_name} (${job_name}) ${job_level}" ${recipients};
+if [ "$transport" == "B" ]; then
+  # for bsmtp
+  /usr/sbin/bsmtp -h localhost \
+                  -f "${sender}" \
+                  -s "Bacula: ${job_type} ${job_exit_status} of ${client_name} ${job_level}" \
+                  ${recipients}
+elif [ "$transport" == "P" ]; then
+  # for postfix
+  /usr/bin/mail -r "${sender}" \
+                -s "Bacula Backup System: ${job_type} ${job_exit_status} of \
+                 ${client_name} (${job_name}) ${job_level}" \
+                 "${recipients}"
+elif [ "$transport" != "0" ]; then
+  echo ERROR: Invalid transport ${transport}
+fi
 
-# for postfix
-/usr/bin/mail -r "mail@example.com.br" \
-              -s "Bacula Sistema de Backup: ${job_type} ${job_exit_status} of \
-               ${client_name} (${job_name}) ${job_level}" \
-               "${recipients}"
 /var/spool/bacula/bacula-zabbix.bash $job_id;
 
 exit;
