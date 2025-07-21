@@ -22,8 +22,7 @@ if [ "$transport" == "B" ]; then
 elif [ "$transport" == "P" ]; then
   # for postfix
   /usr/bin/mail -r "${sender}" \
-                -s "Bacula Backup System: ${job_type} ${job_exit_status} of \
-                 ${client_name} (${job_name}) ${job_level}" \
+                -s "Bacula: ${job_type} ${job_exit_status} of ${client_name} ${job_level}" \
                  "${recipients}"
 elif [ "$transport" != "0" ]; then
   echo ERROR: Invalid transport ${transport}
