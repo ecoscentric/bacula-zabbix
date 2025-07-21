@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.4'
   template_groups:
     - uuid: 7df96b18c230490a9a0a9e2307226338
       name: Templates
@@ -14,6 +14,7 @@ zabbix_export:
           name: 'Backup Differential Bytes'
           type: TRAP
           key: bacula.diff.job.bytes
+          history: 90d
           units: B
           tags:
             - tag: Application
@@ -22,6 +23,7 @@ zabbix_export:
           name: 'Backup Differential Compression'
           type: TRAP
           key: bacula.diff.job.compr
+          history: 90d
           value_type: FLOAT
           tags:
             - tag: Application
@@ -30,6 +32,7 @@ zabbix_export:
           name: 'Backup Differential Files'
           type: TRAP
           key: bacula.diff.job.files
+          history: 90d
           tags:
             - tag: Application
               value: Bacula
@@ -37,6 +40,7 @@ zabbix_export:
           name: 'Backup Differential Speed'
           type: TRAP
           key: bacula.diff.job.speed
+          history: 90d
           value_type: FLOAT
           units: KB/s
           tags:
@@ -46,6 +50,7 @@ zabbix_export:
           name: 'Backup Differential OK'
           type: TRAP
           key: bacula.diff.job.status
+          history: 90d
           tags:
             - tag: Application
               value: Bacula
@@ -54,10 +59,12 @@ zabbix_export:
               expression: 'last(/Template Bacula/bacula.diff.job.status)>1'
               name: 'Backup Differential FAIL in {HOST.NAME}'
               priority: AVERAGE
+              manual_close: 'YES'
         - uuid: 8e797c898f0a4fdc8d0b661a742d8f8b
           name: 'Backup Differential Time'
           type: TRAP
           key: bacula.diff.job.time
+          history: 90d
           units: s
           tags:
             - tag: Application
@@ -66,6 +73,7 @@ zabbix_export:
           name: 'Backup Full Bytes'
           type: TRAP
           key: bacula.full.job.bytes
+          history: 90d
           units: B
           tags:
             - tag: Application
@@ -74,6 +82,7 @@ zabbix_export:
           name: 'Backup Full Compression'
           type: TRAP
           key: bacula.full.job.compr
+          history: 90d
           value_type: FLOAT
           tags:
             - tag: Application
@@ -82,6 +91,7 @@ zabbix_export:
           name: 'Backup Full Files'
           type: TRAP
           key: bacula.full.job.files
+          history: 90d
           tags:
             - tag: Application
               value: Bacula
@@ -89,6 +99,7 @@ zabbix_export:
           name: 'Backup Full Speed'
           type: TRAP
           key: bacula.full.job.speed
+          history: 90d
           value_type: FLOAT
           units: KB/s
           tags:
@@ -98,6 +109,7 @@ zabbix_export:
           name: 'Backup Full OK'
           type: TRAP
           key: bacula.full.job.status
+          history: 90d
           tags:
             - tag: Application
               value: Bacula
@@ -106,10 +118,12 @@ zabbix_export:
               expression: 'last(/Template Bacula/bacula.full.job.status)>1'
               name: 'Backup Full FAIL in {HOST.NAME}'
               priority: HIGH
+              manual_close: 'YES'
         - uuid: 96b4480f70e448eca6d48f44baf6f716
           name: 'Backup Full Time'
           type: TRAP
           key: bacula.full.job.time
+          history: 90d
           units: s
           tags:
             - tag: Application
@@ -118,6 +132,7 @@ zabbix_export:
           name: 'Backup Incremental Bytes'
           type: TRAP
           key: bacula.incr.job.bytes
+          history: 90d
           units: B
           tags:
             - tag: Application
@@ -126,7 +141,9 @@ zabbix_export:
           name: 'Backup Incremental Compression'
           type: TRAP
           key: bacula.incr.job.compr
+          history: 90d
           value_type: FLOAT
+          trends: '0'
           tags:
             - tag: Application
               value: Bacula
@@ -134,6 +151,7 @@ zabbix_export:
           name: 'Backup Incremental Files'
           type: TRAP
           key: bacula.incr.job.files
+          history: 90d
           tags:
             - tag: Application
               value: Bacula
@@ -141,6 +159,7 @@ zabbix_export:
           name: 'Backup Incremental Speed'
           type: TRAP
           key: bacula.incr.job.speed
+          history: 90d
           value_type: FLOAT
           units: KB/s
           tags:
@@ -150,6 +169,7 @@ zabbix_export:
           name: 'Backup Incremental OK'
           type: TRAP
           key: bacula.incr.job.status
+          history: 90d
           tags:
             - tag: Application
               value: Bacula
@@ -158,10 +178,12 @@ zabbix_export:
               expression: 'last(/Template Bacula/bacula.incr.job.status)>1'
               name: 'Backup Incremental FAIL in {HOST.NAME}'
               priority: WARNING
+              manual_close: 'YES'
         - uuid: ef04614a446b4049bad4c8384b2a6317
           name: 'Backup Incremental Time'
           type: TRAP
           key: bacula.incr.job.time
+          history: 90d
           units: s
           tags:
             - tag: Application
@@ -170,7 +192,9 @@ zabbix_export:
           name: 'Backup Server Label Jobs'
           type: TRAP
           key: bacula.label.jobs
-          description: 'Verifica se algum job pracisa de disco, use o comando label se necessário'
+          history: 90d
+          status: DISABLED
+          description: 'Check if any job needs a disk and use the label command if necessary'
           tags:
             - tag: Application
               value: Bacula
@@ -179,33 +203,50 @@ zabbix_export:
               expression: 'last(/Template Bacula/bacula.label.jobs)>=1'
               name: 'Bacula Server Label Action Needed'
               priority: DISASTER
-              description: 'Precisa Rotular ou dar Prune num volume para ser usado para o Job'
+              description: 'Need to Label or Prune a Volume to be used for the Job'
+              manual_close: 'YES'
         - uuid: d8eb3f69312741a2a3e90a88ed95373c
           name: 'Backup Server Running Jobs'
           type: TRAP
           key: bacula.running.jobs
-          description: 'Conta quantos jobs rodando'
-          tags:
-            - tag: Application
-              value: Bacula
-        - uuid: 3f6fee66ea684ecc81da7dd424e1825f
-          name: 'Backup Server Running Jobs Alerta'
-          type: TRAP
-          key: bacula.running.jobs.alert
-          description: 'Conta quantos jobs rodando'
+          history: 90d
+          status: DISABLED
+          description: 'Number of running jobs'
           tags:
             - tag: Application
               value: Bacula
           triggers:
-            - uuid: 1877420bbfa64029bd081c4e6305254b
-              expression: 'last(/Template Bacula/bacula.running.jobs.alert)>=1'
-              name: 'Bacula Server Running Jobs, Check Bacula for Problem'
-              priority: DISASTER
-              description: 'Não deve haver jobs rodando neste horário.'
+            - uuid: a11398663a7444dfb28b23f615368216
+              expression: |
+                last(/Template Bacula/bacula.running.jobs)>=1 and 
+                time()>={$BACULA.RUNNING.JOBS.NWD.START} and 
+                time()<={$BACULA.RUNNING.JOBS.NWD.END} and 
+                dayofweek()<6
+              name: 'Bacula Server Still Running Jobs, Check Bacula for possible issue'
+              priority: HIGH
+              description: 'Bacula jobs are running unexpectedly during a weekday between {$BACULA.RUNNING.JOBS.NWD.START} and {$BACULA.RUNNING.JOBS.NWD.END}'
+              manual_close: 'YES'
+        - uuid: aec4a992374740a2a19c766878b086a1
+          name: 'Backup Server Waiting Jobs'
+          type: TRAP
+          key: bacula.waiting.jobs
+          history: 90d
+          status: DISABLED
+          description: 'Number of waiting jobs'
+          tags:
+            - tag: Application
+              value: Bacula
+          triggers:
+            - uuid: 32cb3b39952742488de929a67645f562
+              expression: 'last(/Template Bacula/bacula.waiting.jobs)>={$BACULA.WAITING.JOBS.MAX}'
+              name: 'Bacula Server Waiting Jobs Exceeds Permitted Maximum'
+              priority: HIGH
+              manual_close: 'YES'
         - uuid: 0c56274d6a294bfb9adbff14ac32c004
           name: 'Bacula Director is running'
           key: 'proc.num[{$BACULA.DIR}]'
           delay: '30'
+          history: 90d
           status: DISABLED
           tags:
             - tag: Application
@@ -215,10 +256,12 @@ zabbix_export:
               expression: 'last(/Template Bacula/proc.num[{$BACULA.DIR}])=0'
               name: 'Bacula Director is DOWN in {HOST.NAME}'
               priority: DISASTER
+              manual_close: 'YES'
         - uuid: a2ec0ddbe8064c448a4a4c9f71bd4c7b
           name: 'Bacula File is running'
           key: 'proc.num[{$BACULA.FD}]'
           delay: '30'
+          history: 90d
           status: DISABLED
           tags:
             - tag: Application
@@ -228,10 +271,12 @@ zabbix_export:
               expression: 'last(/Template Bacula/proc.num[{$BACULA.FD}])=0'
               name: 'Bacula File is DOWN in {HOST.NAME}'
               priority: HIGH
+              manual_close: 'YES'
         - uuid: 2dea8336b4c34da6ae7202765aaa46db
           name: 'Bacula Storage is running'
           key: 'proc.num[{$BACULA.SD}]'
           delay: '30'
+          history: 90d
           status: DISABLED
           tags:
             - tag: Application
@@ -241,20 +286,33 @@ zabbix_export:
               expression: 'last(/Template Bacula/proc.num[{$BACULA.SD}])=0'
               name: 'Bacula Storage is DOWN in {HOST.NAME}'
               priority: DISASTER
+              manual_close: 'YES'
       macros:
         - macro: '{$BACULA.DIR}'
           value: bacula-dir
+          description: 'Name of bacula-dir executable'
         - macro: '{$BACULA.FD}'
           value: bacula-fd
+          description: 'Name of bacula-fd executable'
+        - macro: '{$BACULA.RUNNING.JOBS.NWD.END}'
+          value: '120000'
+          description: 'End time of weekday window when no jobs permitted'
+        - macro: '{$BACULA.RUNNING.JOBS.NWD.START}'
+          value: '090000'
+          description: 'Start time of weekday window when no jobs permitted'
         - macro: '{$BACULA.SD}'
           value: bacula-sd
+          description: 'Name of bacula-sd executable'
+        - macro: '{$BACULA.WAITING.JOBS.MAX}'
+          value: '10'
+          description: 'Maximum permitted number of waiting jobs'
       dashboards:
         - uuid: 2caf89765d1a45d29d6b154aeb6b675b
           name: 'Backup Differential'
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -262,12 +320,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Differential - Bytes transferred'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -275,12 +336,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Differential - Elapsed time'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -288,12 +352,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Differential - Compression rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -301,13 +368,16 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Differential - Files transferred'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -315,6 +385,9 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Differential - Transfer rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                     - type: INTEGER
                       name: source_type
                       value: '0'
@@ -323,7 +396,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -331,12 +404,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Full - Bytes transferred'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -344,12 +420,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Full - Elapsed time'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -357,12 +436,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Full - Compression rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -370,13 +452,16 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Full - Files transferred'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -384,6 +469,9 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Full - Transfer rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                     - type: INTEGER
                       name: source_type
                       value: '0'
@@ -392,7 +480,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -400,12 +488,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Incremental - Bytes transferred'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -413,12 +504,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Incremental - Elapsed time'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -426,12 +520,15 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Incremental - Compression rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -439,13 +536,16 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Incremental - Files transferred'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                     - type: INTEGER
                       name: source_type
                       value: '0'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -453,6 +553,9 @@ zabbix_export:
                       value:
                         host: 'Template Bacula'
                         name: 'Backup Incremental - Transfer rate'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                     - type: INTEGER
                       name: source_type
                       value: '0'
