@@ -4,9 +4,15 @@
 # older path
 # source /etc/bacula/bacula-zabbix.conf
 # new path
-source /opt/bacula/etc/bacula-zabbix.conf
+source /etc/bacula/bacula-zabbix.conf
 
-# start tee logging
+# Ensure we can write to logger
+if ! [ -z "${scriptLogFile}" ]; then
+  touch ${scriptLogFile} 2>&1 > /dev/null
+  if [ $? -ne 0 ]; then exit 17; fi
+fi
+
+# Logfiles
 LOG="tee -a ${scriptLogFile}"
 
 # Get Job ID from parameter
@@ -67,6 +73,14 @@ echo "[$baculaJobId] Job Status: ${baculaJobStatus} => ${status}" | ${LOG} > /de
 # Get client's name from database
 baculaClientName=$($sql "select Client.Name from Client,Job where Job.ClientId=Client.ClientId and Job.JobId=$baculaJobId;" 2>/dev/null)
 if [ -z $baculaClientName ] ; then exit 15 ; fi
+
+# Map from bacula to Zabbix
+if [ ! -z "${hostmap[$baculaClientName]}" ]; then
+  baculaClientName="${hostmap[$baculaClientName]}"
+else
+  echo "[$baculaJobId] No hostmap entry for ${baculaClientName}" | ${LOG} > /dev/null
+fi
+
 echo "[$baculaJobId] Client Name: ${baculaClientName}" | ${LOG} > /dev/null
 
 # Initialize return as zero
